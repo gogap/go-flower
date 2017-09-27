@@ -1,0 +1,50 @@
+postgresql:
+  image: registry.cn-hangzhou.aliyuncs.com/acs-sample/postgresql-sameersbn:9.4-24
+  environment:
+    - DB_USER=gitlab
+    - DB_PASS=password
+    - DB_NAME=gitlabhq_production
+    - DB_EXTENSION=pg_trgm
+  labels:
+    aliyun.probe.url: tcp://container:5432
+  volumes:
+    - /srv/docker/gitlab/postgresql:/var/lib/postgresql
+gitlab:
+  image: registry.cn-hangzhou.aliyuncs.com/acs-sample/gitlab-sameersbn:latest
+  links:
+    - redis:redisio
+    - postgresql:postgresql
+  ports:
+    - "10080:80"
+    - "10022:22"
+  environment:
+    - TZ=Asia/Shanghai
+    - SMTP_ENABLED=false
+    - SMTP_DOMAIN=www.example.com
+    - SMTP_HOST=smtp.gmail.com
+    - SMTP_PORT=587
+    - SMTP_USER=mailer@example.com
+    - SMTP_PASS=password
+    - SMTP_STARTTLS=true
+    - SMTP_AUTHENTICATION=login
+    - GITLAB_TIMEZONE=Kolkata
+    - GITLAB_HOST=localhost
+    - GITLAB_PORT=80
+    - GITLAB_SSH_PORT=22
+    - GITLAB_EMAIL=admin@example.com
+    - GITLAB_EMAIL_REPLY_TO=noreply@example.com
+    - GITLAB_BACKUPS=daily
+    - GITLAB_BACKUP_TIME=01:00
+    - GITLAB_SECRETS_DB_KEY_BASE=long-and-random-alphanumeric-string
+    - GITLAB_SECRETS_SECRET_KEY_BASE=long-and-random-alpha-numeric-string
+    - GITLAB_SECRETS_OTP_KEY_BASE=long-and-random-alpha-numeric-string
+  volumes:
+    - /srv/docker/gitlab/gitlab:/home/git/data
+  labels:
+    aliyun.probe.url: tcp://container:80
+    aliyun.probe.initial_delay_seconds: "10"
+    aliyun.routing.port_80: gitlab-test
+redis:
+  image: registry.cn-hangzhou.aliyuncs.com/acs-sample/redis-sameersbn:latest
+  volumes:
+    - /srv/docker/gitlab/redis:/var/lib/redis
