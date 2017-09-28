@@ -6,7 +6,7 @@ waitForClusterReady = fn(name) {
 
 	clients = new aliyun.AliyunClients(config)
 
-	clusterId, exist = ctx.Get("CLUSTERS_"+name)
+	clusterId, exist = CTX.Get("CLUSTERS_"+name)
 
 	if !exist {
 
@@ -37,7 +37,7 @@ waitForClusterReady = fn(name) {
 	}
 
 
-	log.WithField("CODE", code).
+	LOG.WithField("CODE", CODE).
 		WithField("CLUSTER_NAME", name).
 		WithField("CLUSTER_ID", clusterId).
 		Infoln("Wating for clutser ready")
@@ -49,7 +49,7 @@ waitForClusterReady = fn(name) {
 		panic(err)
 	}
 
-	log.WithField("CODE", code).
+	LOG.WithField("CODE", CODE).
 		WithField("CLUSTER_NAME", name).
 		WithField("CLUSTER_ID", clusterId).
 		Infoln("Clutser is running")
@@ -58,10 +58,14 @@ waitForClusterReady = fn(name) {
 
 main {
 
-	log.WithField("CODE", code).Debug("Enter wait_for_cluster_ready.ql")
+	LOG.WithField("CODE", CODE).Debug("Enter wait_for_cluster_ready.ql")
+
+	if !CanContinue("docker_cluster") {
+	 	return
+	}
 
 	
-	clustersConf = config.GetConfig("docker.clusters")
+	clustersConf = CONFIG.GetConfig("docker.clusters")
 
 	if clustersConf == nil {
 		panic("clusters's config is empty")
@@ -88,5 +92,5 @@ main {
 
 	wg.Wait()
 
-	log.WithField("CODE", code).Infoln("All cluster are runnig")
+	LOG.WithField("CODE", CODE).Infoln("All cluster are runnig")
 }

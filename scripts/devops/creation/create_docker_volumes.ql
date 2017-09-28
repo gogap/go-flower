@@ -101,7 +101,7 @@ createVolume = fn(clusterName, name, volumeConf) {
 		panic(err)
 	}
 
-	log.WithField("CODE", code).
+	LOG.WithField("CODE", CODE).
 		WithField("CLUSTER_NAME", clusterName).
 		WithField("CLUSTER_ID", clusterId).
 		WithField("VOLUME_NAME", name).
@@ -111,10 +111,14 @@ createVolume = fn(clusterName, name, volumeConf) {
 
 main {
 
-	log.WithField("CODE", code).Debug("Enter create_docker_volume.ql")
+	LOG.WithField("CODE", CODE).Debug("Enter create_docker_volumes.ql")
+
+	if !CanContinue("docker_volumes") {
+	 	return
+	 }
 
 	
-	clustersConf = config.GetConfig("docker.clusters")
+	clustersConf = CONFIG.GetConfig("docker.clusters")
 
 	if clustersConf == nil {
 		return

@@ -30,9 +30,6 @@ var Exports = map[string]interface{}{
 	"Scaling":                cs.Scaling,
 	"Updating":               cs.Updating,
 	"VPCNetwork":             cs.VPCNetwork,
-	"NetworkModeType":        func(v string) cs.NetworkModeType { return cs.NetworkModeType(v) },
-	"ClusterState":           func(v string) cs.ClusterState { return cs.ClusterState(v) },
-	"VolumeDriverType":       func(v string) cs.VolumeDriverType { return cs.VolumeDriverType(v) },
 
 	"client":                  cs.NewClient,
 	"ClusterCerts":            qlang.StructOf((*cs.ClusterCerts)(nil)),
@@ -40,6 +37,7 @@ var Exports = map[string]interface{}{
 	"ClusterCreationResponse": qlang.StructOf((*cs.ClusterCreationResponse)(nil)),
 	"ClusterResizeArgs":       qlang.StructOf((*cs.ClusterResizeArgs)(nil)),
 	"ClusterType":             qlang.StructOf((*cs.ClusterType)(nil)),
+	"Container":               qlang.StructOf((*cs.Container)(nil)),
 	"Definition":              qlang.StructOf((*cs.Definition)(nil)),
 	"GetVolumeResponse":       qlang.StructOf((*cs.GetVolumeResponse)(nil)),
 	"GetVolumesResponse":      qlang.StructOf((*cs.GetVolumesResponse)(nil)),
@@ -58,4 +56,8 @@ var Exports = map[string]interface{}{
 	"VolumeCreationArgs":      qlang.StructOf((*cs.VolumeCreationArgs)(nil)),
 	"VolumeCreationResponse":  qlang.StructOf((*cs.VolumeCreationResponse)(nil)),
 	"VolumeRef":               qlang.StructOf((*cs.VolumeRef)(nil)),
+
+	"NetworkModeType":  qlang.StructOf((*cs.NetworkModeType)(nil)),
+	"ClusterState":     qlang.StructOf((*cs.ClusterState)(nil)),
+	"VolumeDriverType": qlang.StructOf((*cs.VolumeDriverType)(nil)),
 }

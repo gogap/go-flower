@@ -20,7 +20,7 @@ createBuckets = fn(name, perm) {
 			panic(err)
 		}
 	} else {
-		log.WithField("CODE", code).WithField("BUCKET", name).Infoln("Bucket already exist")
+		LOG.WithField("CODE", CODE).WithField("BUCKET", name).Infoln("Bucket already exist")
 		return
 	}
 
@@ -30,14 +30,18 @@ createBuckets = fn(name, perm) {
 		panic(err)
 	}
 
-	log.WithField("CODE", code).WithField("BUCKET", name).Infoln("New bucket created")
+	LOG.WithField("CODE", CODE).WithField("BUCKET", name).Infoln("New bucket created")
 }
 
 main {
 
-	log.WithField("CODE", code).Debug("Enter create_oss_buckets.ql")
+	LOG.WithField("CODE", CODE).Debug("Enter create_oss_buckets.ql")
 
-	ossConf = config.GetConfig("oss")
+	if !CanContinue("oss_buckets") {
+	 	return
+	}
+
+	ossConf = _CONFIG.GetConfig("oss")
 
 	if ossConf == nil {
 		panic("oss config not set")

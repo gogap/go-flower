@@ -4,9 +4,13 @@ include "../includes"
 
 main {
 
-	log.WithField("CODE", code).Debug("Enter create_vswitch.ql")
+	LOG.WithField("CODE", CODE).Debug("Enter create_vswitch.ql")
 
-	vpcId, vpcIdExist = ctx.Get("VPC_ID")
+	if !CanContinue("vswitch") {
+	 	return
+	}
+
+	vpcId, vpcIdExist = CTX.Get("VPC_ID")
 
 
 	// VPCID 不存在，说明未走VPC创建的流程
@@ -14,10 +18,10 @@ main {
 		panic("VPC_ID not in ctx")
 	}
 
-	vSwitchRedisKey = code + ".devops.aliyun.ecs.vswitch.id"
+	vSwitchRedisKey = CODE + ".devops.aliyun.ecs.vswitch.id"
 
 	// 检查是已经创建了这个VSwitch实例
-	exists, err = redis.Exists(vSwitchRedisKey).Result()
+	exists, err = REDIS.Exists(vSwitchRedisKey).Result()
 
 	if err!= nil {
 		panic(err)
@@ -26,11 +30,11 @@ main {
 	// 如果已经存在了，则就不再创建了
 	if exists == 1  {
 
-		vSwitchId = redis.Get(vSwitchRedisKey).Val()
+		vSwitchId = REDIS.Get(vSwitchRedisKey).Val()
 
-		ctx.Set("VSWITCH_ID", vSwitchId)
+		CTX.Set("VSWITCH_ID", vSwitchId)
 
-		log.WithField("CODE", code).WithField("VSWITCH_ID", vSwitchId).Infoln("VSwitch already exist")
+		LOG.WithField("CODE", CODE).WithField("VSWITCH_ID", vSwitchId).Infoln("VSwitch already exist")
 
 		return
 	}
@@ -38,7 +42,7 @@ main {
 
 	clients = new aliyun.AliyunClients(config)
 
-	zoneId = config.GetString("ecs.vswitch.zone-id")
+	zoneId = CONFIG.GetString("ecs.vswitch.zone-id")
 
 	if len(zoneId) > 0 {
 		if !strings.HasPrefix(zoneId, clients.RegionId()) {
@@ -48,10 +52,10 @@ main {
 
 	args = &aliyun_ecs.CreateVSwitchArgs {
 		VpcId       : vpcId,
-		ZoneId      : config.GetString("ecs.vswitch.zone-id"),
-		VSwitchName : config.GetString("ecs.vswitch.name", "vswitch_"+code),
-		CidrBlock   : config.GetString("ecs.vswitch.cidr-block", "172.16.1.0/16"),
-		Description : config.GetString("ecs.vswitch.description"),
+		ZoneId      : CONFIG.GetString("ecs.vswitch.zone-id"),
+		VSwitchName : CONFIG.GetString("ecs.vswitch.name", "vswitch_"+CODE),
+		CidrBlock   : CONFIG.GetString("ecs.vswitch.cidr-block", "172.16.1.0/16"),
+		Description : CONFIG.GetString("ecs.vswitch.description"),
 	}
 
 	vSwitchId, err = clients.ECS().CreateVSwitch(args)
@@ -60,11 +64,11 @@ main {
 	 	panic(err)
 	}
 
-	ctx.Set("VSWITCH_ID", vSwitchId)
+	CTX.Set("VSWITCH_ID", vSwitchId)
 
-	log.WithField("CODE", code).WithField("VSWITCH_ID", vSwitchId).Infoln("New VSwitch created")
+	LOG.WithField("CODE", CODE).WithField("VSWITCH_ID", vSwitchId).Infoln("New VSwitch created")
 
-	err = redis.Set(vSwitchRedisKey, vSwitchId, 0).Err()
+	err = REDIS.Set(vSwitchRedisKey, vSwitchId, 0).Err()
 
 	if err!= nil {
 		panic(err)

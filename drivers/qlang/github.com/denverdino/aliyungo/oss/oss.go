@@ -34,8 +34,6 @@ var Exports = map[string]interface{}{
 	"USEast1":            oss.USEast1,
 	"USWest1":            oss.USWest1,
 	"Zhangjiakou":        oss.Zhangjiakou,
-	"ACL":                func(v string) oss.ACL { return oss.ACL(v) },
-	"Region":             func(v string) oss.Region { return oss.Region(v) },
 
 	"authenticateCallBack": oss.AuthenticateCallBack,
 	"setAttemptStrategy":   oss.SetAttemptStrategy,
@@ -65,4 +63,7 @@ var Exports = map[string]interface{}{
 	"RedirectAllRequestsTo":     qlang.StructOf((*oss.RedirectAllRequestsTo)(nil)),
 	"RoutingRule":               qlang.StructOf((*oss.RoutingRule)(nil)),
 	"WebsiteConfiguration":      qlang.StructOf((*oss.WebsiteConfiguration)(nil)),
+
+	"ACL":    qlang.StructOf((*oss.ACL)(nil)),
+	"Region": qlang.StructOf((*oss.Region)(nil)),
 }

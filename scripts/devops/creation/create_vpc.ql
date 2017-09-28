@@ -4,12 +4,16 @@ include "../includes"
 
 main {
 
-	log.WithField("CODE", code).Debug("Enter create_vpc.ql")
+	LOG.WithField("CODE", CODE).Debug("Enter create_vpc.ql")
 
-	vpcIdRedisKey = code + ".devops.aliyun.ecs.vpc.id"
+	if !CanContinue("vpc") {
+	 	return
+	}
+
+	vpcIdRedisKey = _CODE + ".devops.aliyun.ecs.vpc.id"
 
 	// 检查是已经创建了这个VPC实例
-	exists, err = redis.Exists(vpcIdRedisKey).Result()
+	exists, err = _REDIS.Exists(vpcIdRedisKey).Result()
 
 	if err!= nil {
 		panic(err)
@@ -18,23 +22,23 @@ main {
 	// 如果已经存在了，则就不再创建了
 	if exists == 1  {
 
-		vpcId = redis.Get(vpcIdRedisKey).Val()
+		vpcId = _REDIS.Get(vpcIdRedisKey).Val()
 
-		ctx.Set("VPC_ID", vpcId)
+		CTX.Set("VPC_ID", vpcId)
 
-		log.WithField("CODE", code).WithField("VPC_ID", vpcId).Infoln("VPC already exist")
+		LOG.WithField("CODE", _CODE).WithField("VPC_ID", vpcId).Infoln("VPC already exist")
 
 		return
 	}
 
 
-	clients = new aliyun.AliyunClients(config)
+	clients = new aliyun.AliyunClients(_CONFIG)
 
 	args = &aliyun_ecs.CreateVpcArgs {
 		RegionId    : clients.Region(),
-		VpcName     : config.GetString("ecs.vpc.name", "vpc_"+code),
-		CidrBlock   : config.GetString("ecs.vpc.cidr-block", "172.16.0.0/16"),
-		Description : config.GetString("ecs.vpc.description", "172.16.0.0/16"),
+		VpcName     : _CONFIG.GetString("ecs.vpc.name", "vpc_"+_CODE),
+		CidrBlock   : _CONFIG.GetString("ecs.vpc.cidr-block", "172.16.0.0/16"),
+		Description : _CONFIG.GetString("ecs.vpc.description", "172.16.0.0/16"),
 	}
 
 	resp, err = clients.ECS().CreateVpc(args)
@@ -43,12 +47,12 @@ main {
 	 	panic(err)
 	}
 
-	ctx.Set("VPC_ID", resp.VpcId)
+	CTX.Set("VPC_ID", resp.VpcId)
 
-	log.WithField("CODE", code).WithField("VPC_ID", resp.VpcId).Infoln("New VPC created")
+	LOG.WithField("CODE", _CODE).WithField("VPC_ID", resp.VpcId).Infoln("New VPC created")
 
 
-	err = redis.Set(vpcIdRedisKey, resp.VpcId, 0).Err()
+	err = _REDIS.Set(vpcIdRedisKey, resp.VpcId, 0).Err()
 
 	if err!= nil {
 		panic(err)

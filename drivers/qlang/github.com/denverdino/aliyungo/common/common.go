@@ -45,7 +45,6 @@ var Exports = map[string]interface{}{
 	"XMLResponseFormat":  common.XMLResponseFormat,
 	"Year":               common.Year,
 	"Zhangjiakou":        common.Zhangjiakou,
-	"Region":             func(regionId string) common.Region { return common.Region(regionId) },
 
 	"ValidRegions": common.ValidRegions,
 
@@ -67,4 +66,6 @@ var Exports = map[string]interface{}{
 	"RegionIds":                qlang.StructOf((*common.RegionIds)(nil)),
 	"Request":                  qlang.StructOf((*common.Request)(nil)),
 	"Response":                 qlang.StructOf((*common.Response)(nil)),
+
+	"Region": qlang.StructOf((*common.Region)(nil)),
 }

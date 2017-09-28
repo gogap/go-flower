@@ -122,9 +122,6 @@ var Exports = map[string]interface{}{
 	"IoOptimizedNone":      ecs.IoOptimizedNone,
 	"IoOptimizedOptimized": ecs.IoOptimizedOptimized,
 
-	"DiskCategory": func(v string) ecs.DiskCategory { return ecs.DiskCategory(v) },
-	"IoOptimized":  func(v string) ecs.IoOptimized { return ecs.IoOptimized(v) },
-
 	"AccountType":                            qlang.StructOf((*ecs.AccountType)(nil)),
 	"AddTagsArgs":                            qlang.StructOf((*ecs.AddTagsArgs)(nil)),
 	"AddTagsResponse":                        qlang.StructOf((*ecs.AddTagsResponse)(nil)),
@@ -382,4 +379,7 @@ var Exports = map[string]interface{}{
 	"VpcAttributesType":                      qlang.StructOf((*ecs.VpcAttributesType)(nil)),
 	"VpcSetType":                             qlang.StructOf((*ecs.VpcSetType)(nil)),
 	"ZoneType":                               qlang.StructOf((*ecs.ZoneType)(nil)),
+
+	"DiskCategory": qlang.StructOf((*ecs.DiskCategory)(nil)),
+	"IoOptimized":  qlang.StructOf((*ecs.IoOptimized)(nil)),
 }

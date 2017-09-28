@@ -26,7 +26,7 @@ createCluster = fn(vpcId, vSwitchId, name, clusterConf) {
 		}
 
 		if exist {
-			log.WithField("CODE", code).
+			LOG.WithField("CODE", CODE).
 				WithField("CLUSTER_NAME", name).
 				WithField("CLUSTER_ID", clusterId).
 				Infoln("Cluster already exist")
@@ -70,14 +70,14 @@ createCluster = fn(vpcId, vSwitchId, name, clusterConf) {
 	clusterID = s.Field("ClusterID").Value()
 
 
-	ctx.Set("CLUSTERS_"+name, clusterID)
+	CTX.Set("CLUSTERS_"+name, clusterID)
 
-	log.WithField("CODE", code).
+	LOG.WithField("CODE", CODE).
 		WithField("CLUSTER_NAME", name).
 		WithField("CLUSTER_ID", clusterID).
 		Infoln("New cluster created")
 
-	err = redis.Set(clusterKey, clusterID, 0).Err()
+	err = REDIS.Set(clusterKey, clusterID, 0).Err()
 
 	if err!= nil {
 		panic(err)
@@ -88,24 +88,28 @@ createCluster = fn(vpcId, vSwitchId, name, clusterConf) {
 main {
 
 
-	log.WithField("CODE", code).Debug("Enter create_docker_clusters.ql")
+	LOG.WithField("CODE", CODE).Debug("Enter create_docker_clusters.ql")
+
+	 if !CanContinue("docker_cluster") {
+	 	return
+	 }
 
 
-	vpcId, vpcIdExist = ctx.Get("VPC_ID")
+	vpcId, vpcIdExist = CTX.Get("VPC_ID")
 
 	if !vpcIdExist {
 		panic("VPC_ID not in ctx")
 	}
 
 
-	vSwitchId, vSwitchIdExist = ctx.Get("VSWITCH_ID")
+	vSwitchId, vSwitchIdExist = CTX.Get("VSWITCH_ID")
 
 	if !vSwitchIdExist {
 		panic("VSWITCH_ID not in ctx")
 	}
 
 
-	clustersConf = config.GetConfig("docker.clusters")
+	clustersConf = CONFIG.GetConfig("docker.clusters")
 
 	if clustersConf == nil {
 		panic("clusters's config is empty")

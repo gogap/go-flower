@@ -6,7 +6,7 @@ include "../includes"
 createProject = fn(clusterName, name, projectConf) {
 
 
-	clients = new aliyun.AliyunClients(config)
+	clients = new aliyun.AliyunClients(CONFIG)
 
 	clusterId = ""
 
@@ -58,12 +58,42 @@ createProject = fn(clusterName, name, projectConf) {
 		panic("template data is empty: "+ templateFile)
 	}
 
+	envsConf = projectConf.GetConfig("environment")
+
+	envKeys = envsConf.Keys()
+
+	mapENVs = make(map[string]string)
+
+	for i=0;i<len(envKeys);i++ {
+		key = envKeys[i]
+		mapENVs[key] = envsConf.GetString(key)
+	}
+
+	proj, err = projClient.GetProject(name)
+
+	if err!=nil {
+		if strings.Contains(err.Error(), "Status Code: 404") {
+			err = nil
+		} else {
+			panic(err)
+		}
+	} else {
+		LOG.WithField("CODE", CODE).
+			WithField("CLUSTER_NAME", clusterName).
+			WithField("CLUSTER_ID", clusterId).
+			WithField("PROJECT_NAME", name).
+			Infoln("Project already exist")
+		return
+	}
+
+
 	args = &aliyun_cs.ProjectCreationArgs{
 		Name        : name,
 		Description : projectConf.GetString("description"),
 		Template    : string(tmplData),
 		Version     : projectConf.GetString("version", "1.0.0"),
 		LatestImage : projectConf.GetBoolean("latest-image", true),
+		Environment : mapENVs,
 	}
 
 	err = projClient.CreateProject(args)
@@ -72,7 +102,7 @@ createProject = fn(clusterName, name, projectConf) {
 		panic(err)
 	}
 
-	log.WithField("CODE", code).
+	LOG.WithField("CODE", CODE).
 		WithField("CLUSTER_NAME", clusterName).
 		WithField("CLUSTER_ID", clusterId).
 		WithField("PROJECT_NAME", name).
@@ -82,10 +112,13 @@ createProject = fn(clusterName, name, projectConf) {
 
 main {
 
-	log.WithField("CODE", code).Debug("Enter create_docker_project.ql")
+	LOG.WithField("CODE", CODE).Debug("Enter create_docker_projects.ql")
 
+	if !CanContinue("docker_projects") {
+	 	return
+	 }
 	
-	clustersConf = config.GetConfig("docker.clusters")
+	clustersConf = _CONFIG.GetConfig("docker.clusters")
 
 	if clustersConf == nil {
 		return
@@ -121,7 +154,7 @@ main {
 			projectConf = projectsConf.GetConfig(projects[i])
 
 			if projectConf == nil{
-				panic("project config not set")
+				panic("project CONFIG not set")
 			}
 
 			createProject(clusterName, projects[i], projectConf)

@@ -11,6 +11,7 @@ AliyunClients = class {
 		this.CSClient=nil
 		this.ECSClient=nil
 		this.OSSClient=nil
+		this.SLBClient=nil
 	}
 
 	fn CS() {
@@ -32,6 +33,18 @@ AliyunClients = class {
 			this.OSSClient = aliyun_oss.newOSSClient(this.OSSRegion(), false, this.akId, this.akSecret, false)
 		}
 		return this.OSSClient
+	}
+
+	fn SLB() {
+		if this.SLBClient == nil {
+			this.SLBClient =  aliyun_slb.newClientWithRegion(
+										aliyun_slb.SLBDefaultEndpoint, 
+										this.akId, 
+										this.akSecret, 
+										this.OSSRegion())
+		}
+		
+		return this.SLBClient
 	}
 
 	fn Region(region...) {

@@ -1,50 +1,94 @@
-postgresql:
-  image: registry.cn-hangzhou.aliyuncs.com/acs-sample/postgresql-sameersbn:9.4-24
-  environment:
-    - DB_USER=gitlab
-    - DB_PASS=password
-    - DB_NAME=gitlabhq_production
-    - DB_EXTENSION=pg_trgm
-  labels:
-    aliyun.probe.url: tcp://container:5432
-  volumes:
-    - /srv/docker/gitlab/postgresql:/var/lib/postgresql
-gitlab:
-  image: registry.cn-hangzhou.aliyuncs.com/acs-sample/gitlab-sameersbn:latest
-  links:
-    - redis:redisio
-    - postgresql:postgresql
-  ports:
+version: '2'
+
+services:
+  redis:
+    restart: always
+    image: sameersbn/redis:latest
+    command:
+    - --loglevel warning
+    volumes:
+    - /srv/docker/gitlab/redis:/var/lib/redis:Z
+
+  gitlab:
+    restart: always
+    image: sameersbn/gitlab:9.5.5
+    depends_on:
+    - redis
+    ports:
     - "10080:80"
     - "10022:22"
-  environment:
-    - TZ=Asia/Shanghai
-    - SMTP_ENABLED=false
-    - SMTP_DOMAIN=www.example.com
-    - SMTP_HOST=smtp.gmail.com
-    - SMTP_PORT=587
-    - SMTP_USER=mailer@example.com
-    - SMTP_PASS=password
-    - SMTP_STARTTLS=true
-    - SMTP_AUTHENTICATION=login
-    - GITLAB_TIMEZONE=Kolkata
-    - GITLAB_HOST=localhost
-    - GITLAB_PORT=80
-    - GITLAB_SSH_PORT=22
-    - GITLAB_EMAIL=admin@example.com
-    - GITLAB_EMAIL_REPLY_TO=noreply@example.com
-    - GITLAB_BACKUPS=daily
-    - GITLAB_BACKUP_TIME=01:00
-    - GITLAB_SECRETS_DB_KEY_BASE=long-and-random-alphanumeric-string
-    - GITLAB_SECRETS_SECRET_KEY_BASE=long-and-random-alpha-numeric-string
-    - GITLAB_SECRETS_OTP_KEY_BASE=long-and-random-alpha-numeric-string
-  volumes:
-    - /srv/docker/gitlab/gitlab:/home/git/data
+    volumes:
+    - /srv/docker/gitlab/git/data:/home/git/data:Z
+    environment:
+    - DEBUG=false
+
+    - DB_ADAPTER=$DB_ADAPTER
+    - DB_HOST=$DB_HOST
+    - DB_PORT=$DB_PORT
+    - DB_USER=$DB_USER
+    - DB_PASS=$DB_PASS
+    - DB_NAME=$DB_NAME
+
+    - REDIS_HOST=$REDIS_HOST
+    - REDIS_PORT=$REDIS_PORT
+
+    - LDAP_ENABLED=$LDAP_ENABLED
+    - LDAP_LABEL=$LDAP_LABEL
+    - LDAP_HOST=$LDAP_HOST
+    - LDAP_PORT=$LDAP_PORT
+    - LDAP_UID =$LDAP_UID
+    - LDAP_METHOD=$LDAP_METHOD
+    - LDAP_BIND_DN=$LDAP_BIND_DN
+    - LDAP_PASS=$LDAP_PASS
+    - LDAP_TIMEOUT=$LDAP_TIMEOUT
+    - LDAP_BASE=$LDAP_BASE
+    - LDAP_USER_FILTER=$LDAP_USER_FILTER
+
+    - LDAP_ACTIVE_DIRECTORY=$LDAP_ACTIVE_DIRECTORY
+    - LDAP_ALLOW_USERNAME_OR_EMAIL_LOGIN=$LDAP_ALLOW_USERNAME_OR_EMAIL_LOGIN
+    - LDAP_BLOCK_AUTO_CREATED_USERS=$LDAP_BLOCK_AUTO_CREATED_USERS
+
+    - GITLAB_REPOS_DIR=$GITLAB_REPOS_DIR
+    - GITLAB_BACKUP_DIR=$GITLAB_BACKUP_DIR
+    - GITLAB_BUILDS_DIR=$GITLAB_BUILDS_DIR
+    - GITLAB_DOWNLOADS_DIR=$GITLAB_DOWNLOADS_DIR
+    - GITLAB_SHARED_DIR=$GITLAB_SHARED_DIR
+
+    - GITLAB_SIGNUP_ENABLED=$GITLAB_SIGNUP_ENABLED
+    - GITLAB_CREATE_GROUP=$GITLAB_CREATE_GROUP
+    - GITLAB_USERNAME_CHANGE=$GITLAB_USERNAME_CHANGE
+    - GITLAB_PROJECTS_WIKI=$GITLAB_PROJECTS_WIKI
+    - GITLAB_PROJECTS_CONTAINER_REGISTRY=$GITLAB_PROJECTS_CONTAINER_REGISTRY
+
+    - TZ=$TZ
+    - GITLAB_TIMEZONE=$GITLAB_TIMEZONE
+
+    - GITLAB_HTTPS=$GITLAB_HTTPS
+
+    - GITLAB_HOST=$GITLAB_HOST
+    - GITLAB_PORT=$GITLAB_PORT
+    - GITLAB_SSH_PORT=$GITLAB_SSH_PORT
+    - GITLAB_RELATIVE_URL_ROOT=$GITLAB_RELATIVE_URL_ROOT
+    - GITLAB_SECRETS_DB_KEY_BASE=$GITLAB_SECRETS_DB_KEY_BASE
+    - GITLAB_SECRETS_SECRET_KEY_BASE=$GITLAB_SECRETS_SECRET_KEY_BASE
+    - GITLAB_SECRETS_OTP_KEY_BASE=$GITLAB_SECRETS_OTP_KEY_BASE
+
+    - GITLAB_ROOT_PASSWORD=$GITLAB_ROOT_PASSWORD
+    - GITLAB_ROOT_EMAIL=$GITLAB_ROOT_EMAIL
+
+    - GITLAB_EMAIL=$GITLAB_EMAIL
+
+    - GITLAB_BACKUP_SCHEDULE=$GITLAB_BACKUP_SCHEDULE
+    - GITLAB_BACKUP_TIME=$GITLAB_BACKUP_TIME
+
+    - NGINX_WORKERS=$NGINX_WORKERS
+    - NGINX_X_FORWARDED_PROTO=$NGINX_X_FORWARDED_PROTO
+    - NGINX_REAL_IP_RECURSIVE=$NGINX_REAL_IP_RECURSIVE
+
+    - SMTP_ENABLED=$SMTP_ENABLED
+    - IMAP_ENABLED=$IMAP_ENABLED
   labels:
     aliyun.probe.url: tcp://container:80
     aliyun.probe.initial_delay_seconds: "10"
-    aliyun.routing.port_80: gitlab-test
-redis:
-  image: registry.cn-hangzhou.aliyuncs.com/acs-sample/redis-sameersbn:latest
-  volumes:
-    - /srv/docker/gitlab/redis:/var/lib/redis
+    aliyun.routing.port_80: git;git.$GIT_DOMAIN
+    aliyun.lb.port_22: tcp://slb_docker_cluster_1_gitlab:10022

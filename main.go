@@ -29,20 +29,36 @@ func main() {
 
 	app := cli.NewApp()
 
-	app.Name = "Flower"
-	app.HelpName = "flower"
+	app.Name = "Go Flower"
+	app.HelpName = "go-flower"
+	app.Usage = "A tiny script runner"
 
 	app.Commands = []cli.Command{
 		{
-			Name: "run",
+			Name:  "run",
+			Usage: "run flow",
 			Flags: []cli.Flag{
+				cli.StringFlag{
+					Name:  "config",
+					Usage: "the flow configuration",
+					Value: "flow.conf",
+				},
 				cli.StringFlag{
 					Name:  "code",
 					Usage: "give a code name for store state",
 				},
 				cli.StringFlag{
 					Name:  "cwd",
-					Usage: "current work dir",
+					Usage: "change current work dir",
+				},
+				cli.StringSliceFlag{
+					Name:  "args",
+					Usage: "passthrough argement to context as key:value format e.g.: --args group:gogap --args debug --args user:zeal",
+				},
+				cli.StringFlag{
+					Name:  "log_level",
+					Usage: "change log level: debug, info, warn, error, fatal, panic",
+					Value: "info",
 				},
 			},
 			Action: run,
@@ -71,7 +87,26 @@ func fileExist(fileName string) bool {
 	return true
 }
 
+func changeLogLevel(ctx *cli.Context) (err error) {
+
+	strLvl := ctx.String("log_level")
+
+	lvl, err := logrus.ParseLevel(strLvl)
+	if err != nil {
+		return
+	}
+
+	logrus.SetLevel(lvl)
+	return
+}
+
 func run(ctx *cli.Context) (err error) {
+
+	err = changeLogLevel(ctx)
+	if err != nil {
+		return
+	}
+
 	code := ctx.String("code")
 
 	if len(code) == 0 {
@@ -109,17 +144,17 @@ func run(ctx *cli.Context) (err error) {
 		return
 	}
 
-	deployConf := config.NewConfig(
-		config.ConfigFile(scriptConfig),
-	)
-
 	flowConf := config.NewConfig(
 		config.ConfigFile(flowConfig),
 	)
 
-	redisAddr := deployConf.GetString("deployer.redis.address", "127.0.0.1:6379")
-	redisDb := deployConf.GetInt32("deployer.redis.db", 0)
-	redisPassword := deployConf.GetString("deployer.redis.password", "")
+	scriptConf := config.NewConfig(
+		config.ConfigFile(scriptConfig),
+	)
+
+	redisAddr := flowConf.GetString("redis.address", "127.0.0.1:6379")
+	redisDb := flowConf.GetInt32("redis.db", 0)
+	redisPassword := flowConf.GetString("redis.password", "")
 
 	redisClient := redis.NewClient(
 		&redis.Options{
@@ -128,11 +163,15 @@ func run(ctx *cli.Context) (err error) {
 			DB:       int(redisDb),
 		})
 
-	redisClient.Ping()
+	if redisClient.Ping().Val() != "PONG" {
+		logrus.WithField("ADDRESS", redisAddr).WithField("DB", redisDb).Warnln("Redis are not available.")
+	}
 
 	f, err := flow.NewFlow(
 		flowConf.GetString("name"),
-		flow.ConfigFile(flowConfig),
+		flow.Config(
+			flowConf.GetConfig("flow"),
+		),
 	)
 
 	if err != nil {
@@ -141,11 +180,16 @@ func run(ctx *cli.Context) (err error) {
 
 	task := f.NewTask()
 
+	strArgs := ctx.StringSlice("args")
+
+	args := NewArgs(strArgs...)
+
 	task.Context().
-		Set("config", deployConf).
-		Set("log", logrus.StandardLogger()).
-		Set("redis", redisClient).
-		Set("code", code)
+		Set("CONFIG", scriptConf).
+		Set("LOG", logrus.StandardLogger()).
+		Set("REDIS", redisClient).
+		Set("CODE", code).
+		Set("ARGS", args)
 
 	err = task.Run()
 
