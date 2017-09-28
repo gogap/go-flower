@@ -1,7 +1,7 @@
 package main
 
 import (
-	"github.com/qiniu/qlang/cl/qlang"
+	"qlang.io/cl/qlang"
 
 	_ "github.com/gogap/flow-contrib/handler/qlang"
 
