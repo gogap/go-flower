@@ -1,0 +1,35 @@
+openldap:
+  image: osixia/openldap:latest
+  environment:
+    LDAP_LOG_LEVEL: $LDAP_LOG_LEVEL
+    LDAP_ORGANISATION: $LDAP_ORGANISATION
+    LDAP_DOMAIN: $LDAP_DOMAIN
+    LDAP_BASE_DN: $LDAP_BASE_DN
+    LDAP_ADMIN_PASSWORD: $LDAP_ADMIN_PASSWORD
+    LDAP_CONFIG_PASSWORD: $LDAP_CONFIG_PASSWORD
+    LDAP_READONLY_USER: $LDAP_READONLY_USER
+    LDAP_READONLY_USER_USERNAME: $LDAP_READONLY_USER_USERNAME
+    LDAP_READONLY_USER_PASSWORD: $LDAP_READONLY_USER_PASSWORD
+    LDAP_BACKEND: $LDAP_BACKEND
+    LDAP_TLS: $LDAP_TLS
+    LDAP_TLS_CRT_FILENAME: $LDAP_TLS_CRT_FILENAME
+    LDAP_TLS_KEY_FILENAME: $LDAP_TLS_KEY_FILENAME
+    LDAP_TLS_CA_CRT_FILENAME: $LDAP_TLS_CA_CRT_FILENAME
+    LDAP_TLS_ENFORCE: $LDAP_TLS_ENFORCE
+    LDAP_TLS_CIPHER_SUITE: $LDAP_TLS_CIPHER_SUITE
+    LDAP_TLS_VERIFY_CLIENT: $LDAP_TLS_VERIFY_CLIENT
+    LDAP_REPLICATION: $LDAP_REPLICATION
+    LDAP_REMOVE_CONFIG_AFTER_SETUP: $LDAP_REMOVE_CONFIG_AFTER_SETUP
+    LDAP_SSL_HELPER_PREFIX: $LDAP_SSL_HELPER_PREFIX
+  volumes:
+    - /srv/docker/openldap/ldap:/var/lib/ldap
+    - /srv/docker/openldap/slapd.d:/etc/ldap/slapd.d
+  ports:
+    - "10389:389"
+    - "10636:636"
+  hostname: "openldap"
+  labels:
+    aliyun.probe.url: tcp://container:389
+    aliyun.probe.initial_delay_seconds: "10"
+    aliyun.lb.port_389: tcp://slb_docker_cluster_1_ldap:10389
+    aliyun.lb.port_636: tcp://slb_docker_cluster_1_ldap:10636

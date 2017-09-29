@@ -6,7 +6,7 @@ include "../includes"
 createBuckets = fn(name, perm) {
 
 
-	clients = new aliyun.AliyunClients(config)
+	clients = new aliyun.AliyunClients(CONFIG)
 
 	bucket = clients.OSS().Bucket(name)
 
@@ -37,11 +37,11 @@ main {
 
 	LOG.WithField("CODE", CODE).Debug("Enter create_oss_buckets.ql")
 
-	if !CanContinue("oss_buckets") {
+	if !ShouldExecute("oss_buckets") {
 	 	return
 	}
 
-	ossConf = _CONFIG.GetConfig("oss")
+	ossConf = CONFIG.GetConfig("oss")
 
 	if ossConf == nil {
 		panic("oss config not set")

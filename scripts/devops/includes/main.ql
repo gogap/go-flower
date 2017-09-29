@@ -8,7 +8,7 @@ CONFIG = CONFIG.GetConfig("devops.creation")
 
 
 
-CanContinue = fn(flag) {
+ShouldExecute = fn(flag) {
 	if ARGS.Exist(flag) || ARGS.Exist("all") {
 		return true
 	}

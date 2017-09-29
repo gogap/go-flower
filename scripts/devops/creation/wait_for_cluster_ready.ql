@@ -4,32 +4,31 @@ include "../includes"
 
 waitForClusterReady = fn(name) {
 
-	clients = new aliyun.AliyunClients(config)
+	clients = new aliyun.AliyunClients(CONFIG)
 
-	clusterId, exist = CTX.Get("CLUSTERS_"+name)
+	clusterId = ""
+	exist = false
 
-	if !exist {
-
-		clusters, err = clients.CS().DescribeClusters(name)
-
-
-		if err!=nil {
-			panic(err)
-		}
-
-		if len(clusters)==0 {
-			panic("cluster of "+name+" not exist")
-		}
+	clusters, err = clients.CS().DescribeClusters(name)
 
 
-		for i=0; i<len(clusters); i++{
-			s = structs.new(clusters[i])
-			if s.Field("Name").Value() == name {
-				clusterId = s.Field("ClusterID").Value()
-				exist = true
-			}
+	if err!=nil {
+		panic(err)
+	}
+
+	if len(clusters)==0 {
+		panic("cluster of "+name+" not exist")
+	}
+
+
+	for i=0; i<len(clusters); i++{
+		s = structs.new(clusters[i])
+		if s.Field("Name").Value() == name {
+			clusterId = s.Field("ClusterID").Value()
+			exist = true
 		}
 	}
+	 
 
 
 	if !exist || len(clusterId) == 0 {
@@ -60,7 +59,7 @@ main {
 
 	LOG.WithField("CODE", CODE).Debug("Enter wait_for_cluster_ready.ql")
 
-	if !CanContinue("docker_cluster") {
+	if !ShouldExecute("docker_cluster") {
 	 	return
 	}
 
@@ -76,6 +75,8 @@ main {
 	if len(clusters) == 0 {
 		panic("non cluster config exist")
 	}
+
+
 
 	wg = sync.NewWaitGroup()
 	wg.Add(len(clusters))

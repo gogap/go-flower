@@ -56,7 +56,7 @@ func main() {
 					Usage: "passthrough argement to context as key:value format e.g.: --args group:gogap --args debug --args user:zeal",
 				},
 				cli.StringFlag{
-					Name:  "log_level",
+					Name:  "loglevel",
 					Usage: "change log level: debug, info, warn, error, fatal, panic",
 					Value: "info",
 				},
@@ -89,7 +89,7 @@ func fileExist(fileName string) bool {
 
 func changeLogLevel(ctx *cli.Context) (err error) {
 
-	strLvl := ctx.String("log_level")
+	strLvl := ctx.String("loglevel")
 
 	lvl, err := logrus.ParseLevel(strLvl)
 	if err != nil {

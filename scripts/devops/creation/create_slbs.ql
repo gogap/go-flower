@@ -225,7 +225,7 @@ main {
 
 	LOG.WithField("CODE", CODE).Debug("Enter create_slb.ql")
 
-	if !CanContinue("slb") {
+	if !ShouldExecute("slb") {
 	 	return
 	}
 

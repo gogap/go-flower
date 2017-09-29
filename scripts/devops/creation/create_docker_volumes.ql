@@ -11,7 +11,7 @@ createVolume = fn(clusterName, name, volumeConf) {
 		panic("volume driver not set")
 	}
 
-	clients = new aliyun.AliyunClients(config)
+	clients = new aliyun.AliyunClients(CONFIG)
 
 
 	clusterId = ""
@@ -113,7 +113,7 @@ main {
 
 	LOG.WithField("CODE", CODE).Debug("Enter create_docker_volumes.ql")
 
-	if !CanContinue("docker_volumes") {
+	if !ShouldExecute("docker_volumes") {
 	 	return
 	 }
 

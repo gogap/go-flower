@@ -6,7 +6,7 @@ main {
 
 	LOG.WithField("CODE", CODE).Debug("Enter create_vswitch.ql")
 
-	if !CanContinue("vswitch") {
+	if !ShouldExecute("vswitch") {
 	 	return
 	}
 

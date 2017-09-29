@@ -7,11 +7,11 @@ createProject = fn(clusterName, name, projectConf) {
 
 
 	clients = new aliyun.AliyunClients(CONFIG)
-
+	
 	clusterId = ""
-
+	
 	exist = false
-
+	
 	clusters, err = clients.CS().DescribeClusters(clusterName)
 
 
@@ -58,16 +58,22 @@ createProject = fn(clusterName, name, projectConf) {
 		panic("template data is empty: "+ templateFile)
 	}
 
-	envsConf = projectConf.GetConfig("environment")
 
-	envKeys = envsConf.Keys()
 
 	mapENVs = make(map[string]string)
 
-	for i=0;i<len(envKeys);i++ {
-		key = envKeys[i]
-		mapENVs[key] = envsConf.GetString(key)
+
+	envsConf = projectConf.GetConfig("environment")
+
+	if envsConf!=nil {
+			envKeys = envsConf.Keys()
+
+			for i=0;i<len(envKeys);i++ {
+				key = envKeys[i]
+				mapENVs[key] = envsConf.GetString(key)
+			}
 	}
+
 
 	proj, err = projClient.GetProject(name)
 
@@ -96,7 +102,9 @@ createProject = fn(clusterName, name, projectConf) {
 		Environment : mapENVs,
 	}
 
+
 	err = projClient.CreateProject(args)
+
 
 	if err!=nil {
 		panic(err)
@@ -114,11 +122,11 @@ main {
 
 	LOG.WithField("CODE", CODE).Debug("Enter create_docker_projects.ql")
 
-	if !CanContinue("docker_projects") {
+	if !ShouldExecute("docker_projects") {
 	 	return
 	 }
 	
-	clustersConf = _CONFIG.GetConfig("docker.clusters")
+	clustersConf = CONFIG.GetConfig("docker.clusters")
 
 	if clustersConf == nil {
 		return
@@ -130,7 +138,7 @@ main {
 		return
 	}
 
-	
+
 
 	for i=0; i<len(clusters); i++{
 

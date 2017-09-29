@@ -7,7 +7,7 @@ include "../includes"
 createCluster = fn(vpcId, vSwitchId, name, clusterConf) {
 
 
-	clients = new aliyun.AliyunClients(config)
+	clients = new aliyun.AliyunClients(CONFIG)
 
 	clusters, err = clients.CS().DescribeClusters(name)
 
@@ -90,7 +90,7 @@ main {
 
 	LOG.WithField("CODE", CODE).Debug("Enter create_docker_clusters.ql")
 
-	 if !CanContinue("docker_cluster") {
+	 if !ShouldExecute("docker_cluster") {
 	 	return
 	 }
 
