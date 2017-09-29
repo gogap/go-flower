@@ -120,7 +120,7 @@ createProject = fn(clusterName, name, projectConf) {
 
 main {
 
-	LOG.WithField("CODE", CODE).Debug("Enter create_docker_projects.ql")
+	LOG.WithField("CODE", CODE).Debug("Enter create_docker_project.ql")
 
 	if !ShouldExecute("docker_projects") {
 	 	return

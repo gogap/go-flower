@@ -35,7 +35,7 @@ createBuckets = fn(name, perm) {
 
 main {
 
-	LOG.WithField("CODE", CODE).Debug("Enter create_oss_buckets.ql")
+	LOG.WithField("CODE", CODE).Debug("Enter create_oss_bucket.ql")
 
 	if !ShouldExecute("oss_buckets") {
 	 	return

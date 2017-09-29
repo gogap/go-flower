@@ -88,7 +88,7 @@ createCluster = fn(vpcId, vSwitchId, name, clusterConf) {
 main {
 
 
-	LOG.WithField("CODE", CODE).Debug("Enter create_docker_clusters.ql")
+	LOG.WithField("CODE", CODE).Debug("Enter create_docker_cluster.ql")
 
 	 if !ShouldExecute("docker_cluster") {
 	 	return

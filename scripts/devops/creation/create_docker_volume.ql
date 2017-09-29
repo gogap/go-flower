@@ -111,7 +111,7 @@ createVolume = fn(clusterName, name, volumeConf) {
 
 main {
 
-	LOG.WithField("CODE", CODE).Debug("Enter create_docker_volumes.ql")
+	LOG.WithField("CODE", CODE).Debug("Enter create_docker_volume.ql")
 
 	if !ShouldExecute("docker_volumes") {
 	 	return
