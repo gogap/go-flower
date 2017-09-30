@@ -31,5 +31,3 @@ openldap:
   labels:
     aliyun.probe.url: tcp://container:389
     aliyun.probe.initial_delay_seconds: "10"
-    aliyun.lb.port_389: tcp://slb_docker_cluster_1_ldap:10389
-    aliyun.lb.port_636: tcp://slb_docker_cluster_1_ldap:10636

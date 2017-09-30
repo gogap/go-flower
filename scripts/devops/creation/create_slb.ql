@@ -193,6 +193,10 @@ createSLB = fn(vSwitchId, name, conf) {
  		return
  	}
 
+	if addressType == "internet" {
+		vSwitchId = ""
+	}
+
 	args = &aliyun_slb.CreateLoadBalancerArgs {
 						RegionId           : clients.Region(),
 						LoadBalancerName   : name,
