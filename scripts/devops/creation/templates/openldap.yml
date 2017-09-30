@@ -22,8 +22,8 @@ openldap:
     LDAP_REMOVE_CONFIG_AFTER_SETUP: $LDAP_REMOVE_CONFIG_AFTER_SETUP
     LDAP_SSL_HELPER_PREFIX: $LDAP_SSL_HELPER_PREFIX
   volumes:
-    - /srv/docker/openldap/ldap:/var/lib/ldap
-    - /srv/docker/openldap/slapd.d:/etc/ldap/slapd.d
+    - /var/lib/docker/user_data/openldap/ldap:/var/lib/ldap
+    - /var/lib/docker/user_data/openldap/slapd.d:/etc/ldap/slapd.d
   ports:
     - "10389:389"
     - "10636:636"

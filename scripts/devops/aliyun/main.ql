@@ -12,6 +12,7 @@ AliyunClients = class {
 		this.ECSClient=nil
 		this.OSSClient=nil
 		this.SLBClient=nil
+		this.RDSClient=nil
 	}
 
 	fn CS() {
@@ -45,6 +46,17 @@ AliyunClients = class {
 		}
 		
 		return this.SLBClient
+	}
+
+	fn RDS() {
+		if this.RDSClient == nil {
+			this.RDSClient =  aliyun_rds.newRDSClient(
+										this.akId, 
+										this.akSecret, 
+										this.OSSRegion())
+		}
+		
+		return this.RDSClient
 	}
 
 	fn Region(region...) {

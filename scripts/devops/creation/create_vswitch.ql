@@ -6,43 +6,32 @@ main {
 
 	LOG.WithField("CODE", CODE).Debug("Enter create_vswitch.ql")
 
-	if !ShouldExecute("vswitch") {
-	 	return
-	}
 
-	vpcId, vpcIdExist = CTX.Get("VPC_ID")
+	vpcId, vpcIdExist = GetENV("VPC_ID")
 
 
 	// VPCID 不存在，说明未走VPC创建的流程
 	if !vpcIdExist {
-		panic("VPC_ID not in ctx")
+		panic("VPC_ID not in env")
 	}
-
-	vSwitchRedisKey = CODE + ".devops.aliyun.ecs.vswitch.id"
 
 	// 检查是已经创建了这个VSwitch实例
-	exists, err = REDIS.Exists(vSwitchRedisKey).Result()
-
-	if err!= nil {
-		panic(err)
-	}
+	vSwitchId, exists = GetENV("VSWITCH_ID")
 
 	// 如果已经存在了，则就不再创建了
-	if exists == 1  {
-
-		vSwitchId = REDIS.Get(vSwitchRedisKey).Val()
-
-		CTX.Set("VSWITCH_ID", vSwitchId)
-
+	if exists {
 		LOG.WithField("CODE", CODE).WithField("VSWITCH_ID", vSwitchId).Infoln("VSwitch already exist")
-
 		return
 	}
 
+	if !ShouldExecute("vswitch") {
+	 	return
+	}
 
-	clients = new aliyun.AliyunClients(config)
 
-	zoneId = CONFIG.GetString("ecs.vswitch.zone-id")
+	clients = new aliyun.AliyunClients(CONFIG)
+
+	zoneId = CONFIG.GetString("ecs.vswitch.zone-id", "")
 
 	if len(zoneId) > 0 {
 		if !strings.HasPrefix(zoneId, clients.RegionId()) {
@@ -60,17 +49,17 @@ main {
 
 	vSwitchId, err = clients.ECS().CreateVSwitch(args)
 
-	if err!=nil {
-	 	panic(err)
-	}
 
-	CTX.Set("VSWITCH_ID", vSwitchId)
-
-	LOG.WithField("CODE", CODE).WithField("VSWITCH_ID", vSwitchId).Infoln("New VSwitch created")
-
-	err = REDIS.Set(vSwitchRedisKey, vSwitchId, 0).Err()
-
-	if err!= nil {
+	err = SetENV("VSWITCH_ID", vSwitchId)
+	if  err!=nil {
 		panic(err)
 	}
+
+	err = SetENV("VSWITCH_ID", vSwitchId)
+
+	if err!=nil {
+		panic(err)
+	}
+
+	LOG.WithField("CODE", CODE).WithField("VSWITCH_ID", vSwitchId).Infoln("New VSwitch created")
 }

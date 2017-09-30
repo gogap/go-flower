@@ -70,18 +70,17 @@ createCluster = fn(vpcId, vSwitchId, name, clusterConf) {
 	clusterID = s.Field("ClusterID").Value()
 
 
-	CTX.Set("CLUSTERS_"+name, clusterID)
+	 err = SetENV("CLUSTERS_"+name, clusterID)
+
+	 if err!=nil{
+	 	panic(err)
+	 }
 
 	LOG.WithField("CODE", CODE).
 		WithField("CLUSTER_NAME", name).
 		WithField("CLUSTER_ID", clusterID).
 		Infoln("New cluster created")
 
-	err = REDIS.Set(clusterKey, clusterID, 0).Err()
-
-	if err!= nil {
-		panic(err)
-	}
 }
 
 
@@ -95,17 +94,17 @@ main {
 	 }
 
 
-	vpcId, vpcIdExist = CTX.Get("VPC_ID")
+	vpcId, vpcIdExist = GetENV("VPC_ID")
 
 	if !vpcIdExist {
-		panic("VPC_ID not in ctx")
+		panic("VPC_ID not in env")
 	}
 
 
-	vSwitchId, vSwitchIdExist = CTX.Get("VSWITCH_ID")
+	vSwitchId, vSwitchIdExist = GetENV("VSWITCH_ID")
 
 	if !vSwitchIdExist {
-		panic("VSWITCH_ID not in ctx")
+		panic("VSWITCH_ID not in env")
 	}
 
 

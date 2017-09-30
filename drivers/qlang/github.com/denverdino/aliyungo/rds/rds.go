@@ -48,7 +48,6 @@ var Exports = map[string]interface{}{
 	"WEEK_ENUM":          rds.WEEK_ENUM,
 
 	"AccountPrivilegeInfo":                     qlang.StructOf((*rds.AccountPrivilegeInfo)(nil)),
-	"AccountType":                              qlang.StructOf((*rds.AccountType)(nil)),
 	"AllocateInstancePublicConnectionArgs":     qlang.StructOf((*rds.AllocateInstancePublicConnectionArgs)(nil)),
 	"AllocateInstancePublicConnectionResponse": qlang.StructOf((*rds.AllocateInstancePublicConnectionResponse)(nil)),
 	"BackupPolicy":                             qlang.StructOf((*rds.BackupPolicy)(nil)),
@@ -61,8 +60,8 @@ var Exports = map[string]interface{}{
 	"CreateAccountResponse":                    qlang.StructOf((*rds.CreateAccountResponse)(nil)),
 	"CreateDatabaseArgs":                       qlang.StructOf((*rds.CreateDatabaseArgs)(nil)),
 	"CreateDatabaseResponse":                   qlang.StructOf((*rds.CreateDatabaseResponse)(nil)),
-	"CreateOrderArgs":                          qlang.StructOf((*rds.CreateOrderArgs)(nil)),
-	"CreateOrderResponse":                      qlang.StructOf((*rds.CreateOrderResponse)(nil)),
+	"CreateDBInstanceArgs":                     qlang.StructOf((*rds.CreateDBInstanceArgs)(nil)),
+	"CreateDBInstanceResponse":                 qlang.StructOf((*rds.CreateDBInstanceResponse)(nil)),
 	"DBInstanceAccount":                        qlang.StructOf((*rds.DBInstanceAccount)(nil)),
 	"DBInstanceAttribute":                      qlang.StructOf((*rds.DBInstanceAttribute)(nil)),
 	"DBInstanceIPArray":                        qlang.StructOf((*rds.DBInstanceIPArray)(nil)),
@@ -103,4 +102,10 @@ var Exports = map[string]interface{}{
 	"RDSRegion":                                qlang.StructOf((*rds.RDSRegion)(nil)),
 	"ReadOnlyDBInstanceIds":                    qlang.StructOf((*rds.ReadOnlyDBInstanceIds)(nil)),
 	"ResetAccountPasswordArgs":                 qlang.StructOf((*rds.ResetAccountPasswordArgs)(nil)),
+
+	"Engine":           qlang.StructOf((*rds.Engine)(nil)),
+	"DBPayType":        qlang.StructOf((*rds.DBPayType)(nil)),
+	"ConnectionMode":   qlang.StructOf((*rds.ConnectionMode)(nil)),
+	"AccountType":      qlang.StructOf((*rds.AccountType)(nil)),
+	"AccountPrivilege": qlang.StructOf((*rds.AccountPrivilege)(nil)),
 }

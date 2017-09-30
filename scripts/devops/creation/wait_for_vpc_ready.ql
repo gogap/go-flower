@@ -11,11 +11,11 @@ main {
 	}
 
  
-	vpcId, vpcIdExist = CTX.Get("VPC_ID")
+	vpcId, vpcIdExist = GetENV("VPC_ID")
  
 	// VPCID 不存在，说明未走VPC创建的流程
 	if !vpcIdExist {
-		panic("VPC_ID not in ctx")
+		panic("VPC_ID not in env")
 	}
 
 	clients = new aliyun.AliyunClients(CONFIG)

@@ -24,7 +24,7 @@ createTCPListener = fn(slbId,slbName, name, conf) {
 					HealthCheckConnectTimeout : int(conf.GetInt64("health-check.timeout", 5)),
 					HealthCheckInterval       : int(conf.GetInt64("health-check.interval", 2)),
 					HealthCheckHttpCode       : aliyun_slb.HealthCheckHttpCodeType(conf.GetString("health-check.http-code", "http_2xx")),
-					
+
 					VServerGroup              : aliyun_slb.FlagType(conf.GetString("vserver-group","on")),
 					VServerGroupId            : conf.GetString("vserver-group-id"),
 		}
@@ -189,7 +189,7 @@ createSLB = fn(vSwitchId, name, conf) {
   	}
 
  	if len(slbs)>0 {
- 		LOG.WithField("CODE", CODE).Warnln("the same name slb already exist")
+ 		LOG.WithField("CODE", CODE).WithField("SLB_NAME", name).Warnln("the same name slb already exist")
  		return
  	}
 
@@ -229,12 +229,10 @@ main {
 	 	return
 	}
 
-	vSwitchRedisKey = CODE + ".devops.aliyun.ecs.vswitch.id"
+	vSwitchId, exists = GetENV("VSWITCH_ID")
 
-	vSwitchId = REDIS.Get(vSwitchRedisKey).Val()
-
-	if len(vSwitchId) == 0 {
-		panic("vSwitchId is empty")
+	if !exists {
+		panic("vSwitchId not exist")
 	}
 
 

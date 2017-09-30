@@ -31,6 +31,8 @@ import (
 	qlutil "github.com/gogap/go-flower/drivers/qlang/github.com/denverdino/aliyungo/util"
 
 	qlstructs "github.com/gogap/go-flower/drivers/qlang/github.com/fatih/structs"
+
+	qlpwgen "github.com/gogap/go-flower/drivers/qlang/github.com/chr4/pwgen"
 )
 
 func init() {
@@ -59,4 +61,5 @@ func init() {
 	qlang.Import("aliyun_sts", qlsts.Exports)
 	qlang.Import("aliyun_util", qlutil.Exports)
 	qlang.Import("structs", qlstructs.Exports)
+	qlang.Import("pwgen", qlpwgen.Exports)
 }

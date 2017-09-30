@@ -6,30 +6,21 @@ main {
 
 	LOG.WithField("CODE", CODE).Debug("Enter create_vpc.ql")
 
-	if !ShouldExecute("vpc") {
-	 	return
-	}
-
-	vpcIdRedisKey = CODE + ".devops.aliyun.ecs.vpc.id"
-
-	// 检查是已经创建了这个VPC实例
-	exists, err = REDIS.Exists(vpcIdRedisKey).Result()
-
-	if err!= nil {
-		panic(err)
-	}
+	vpcId, exists = GetENV("VPC_ID")
 
 	// 如果已经存在了，则就不再创建了
-	if exists == 1  {
-
-		vpcId = REDIS.Get(vpcIdRedisKey).Val()
-
-		CTX.Set("VPC_ID", vpcId)
+	if exists {
 
 		LOG.WithField("CODE", CODE).WithField("VPC_ID", vpcId).Infoln("VPC already exist")
 
 		return
 	}
+
+
+	if !ShouldExecute("vpc") {
+	 	return
+	}
+
 
 
 	clients = new aliyun.AliyunClients(CONFIG)
@@ -47,16 +38,16 @@ main {
 	 	panic(err)
 	}
 
-	CTX.Set("VPC_ID", resp.VpcId)
 
-	LOG.WithField("CODE", CODE).WithField("VPC_ID", resp.VpcId).Infoln("New VPC created")
-
-
-	err = REDIS.Set(vpcIdRedisKey, resp.VpcId, 0).Err()
-
-	if err!= nil {
+	err = SetENV("VPC_ID", resp.VpcId) 
+	
+	if err !=nil {
 		panic(err)
 	}
+ 
+
+	LOG.WithField("CODE", CODE).WithField("VPC_ID", resp.VpcId).Infoln("New VPC created")
+	
 }
 
 

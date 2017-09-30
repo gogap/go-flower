@@ -67,5 +67,8 @@ var Exports = map[string]interface{}{
 	"Request":                  qlang.StructOf((*common.Request)(nil)),
 	"Response":                 qlang.StructOf((*common.Response)(nil)),
 
-	"Region": qlang.StructOf((*common.Region)(nil)),
+	"TimeType":    qlang.StructOf((*common.TimeType)(nil)),
+	"NetType":     qlang.StructOf((*common.NetType)(nil)),
+	"NetworkType": qlang.StructOf((*common.NetworkType)(nil)),
+	"Region":      qlang.StructOf((*common.Region)(nil)),
 }

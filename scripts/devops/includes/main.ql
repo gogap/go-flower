@@ -14,3 +14,34 @@ ShouldExecute = fn(flag) {
 	}
 	return false
 }
+
+
+SetENV = fn(key, value) {
+	err = REDIS.HSet(CODE+"::ENVS", key, value).Err()
+
+	if err!=nil {
+		LOG.WithField("CODE", CODE).
+			WithField("KEY", key).
+			Warnln("Env fail to set")
+	} else {
+		LOG.WithField("CODE", CODE).
+			WithField("KEY", key).
+			Debugln("Env setted")
+	}
+
+
+	return err
+}
+
+GetENV = fn(key) {
+
+	LOG.WithField("KEY",key).Debug("Get env")
+
+	if !REDIS.HExists(CODE+"::ENVS", key).Val() {
+		return "", false
+	}
+
+	result = REDIS.HGet(CODE+"::ENVS", key).Val()
+ 
+	return result, true
+}
