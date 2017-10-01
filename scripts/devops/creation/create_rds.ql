@@ -264,48 +264,18 @@ waitForRDSReady = fn(rdsName, instanceId) {
 
 createRDS = fn(vpcId, vSwitchId, rdsName, rdsConf) {
 
-	rdsKey = CODE + "::DEVOPS_ALIYUN_RDS_"+ rdsName
+	rdsKey = "DEVOPS_ALIYUN_RDS_"+ rdsName
 
-	exists, err = REDIS.Exists(rdsKey).Result()
+	rdsId, rdsExist = GetENV(rdsKey+"_ID")
 
-	if err!= nil {
-		panic(err)
-	}
-
-
-	if exists == 1  {
-
-		kvs, err = REDIS.HGetAll(rdsKey).Result()
-
-		if err!=nil{
-			panic(err)
-		}
-
-		for k,v = range kvs {
-
-			if k == "_" {
-				continue
-			}
-
-			envKey =  "DEVOPS_ALIYUN_RDS_"+ strings.ToUpper(rdsName  + "_" + k)
-
-			err = SetENV(envKey, v)
-
-			if err!=nil{
-				panic(err)
-			}
-			
-			LOG.WithField("CODE", CODE).
-				WithField("ENV", envKey).
-				Debugln("Env setted")
-		}
+	if rdsExist  {
 
 		LOG.WithField("CODE", CODE).
 			WithField("RDS", rdsName).
-			WithField("INSTANCE-ID", kvs["id"]).
+			WithField("INSTANCE-ID", rdsId).
 			Infoln("RDS instance already created")
 
-		return kvs["id"]
+		return rdsId
 	}
 
 	clients = new aliyun.AliyunClients(CONFIG)
@@ -360,21 +330,13 @@ createRDS = fn(vpcId, vSwitchId, rdsName, rdsConf) {
 	
 	values = {"id": instId, "conn": connStr, "port": port, "_": true} // for make map[string]interface{}
 
-	err = REDIS.HMSet(rdsKey, values).Err()
-
-	if err!= nil {
-		panic(err)
-	}
-
-
-
 	for k,v = range values {
 
 		if k == "_" {
 			continue
 		}
 
-		envKey = "DEVOPS_ALIYUN_RDS_"+ strings.ToUpper(rdsName  + "_" + k)
+		envKey = "DEVOPS_ALIYUN_RDS_"+ rdsName  + "_" + k
 
 		err = SetENV(envKey, v)
 

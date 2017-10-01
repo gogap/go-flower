@@ -17,6 +17,10 @@ ShouldExecute = fn(flag) {
 
 
 SetENV = fn(key, value) {
+
+	key = strings.ToUpper(key)
+	key = strings.TrimSpace(key)
+
 	err = REDIS.HSet(CODE+"::ENVS", key, value).Err()
 
 	if err!=nil {
@@ -34,6 +38,9 @@ SetENV = fn(key, value) {
 }
 
 GetENV = fn(key) {
+
+	key = strings.ToUpper(key)
+	key = strings.TrimSpace(key)
 
 	LOG.WithField("KEY",key).Debug("Get env")
 

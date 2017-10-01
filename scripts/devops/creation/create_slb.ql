@@ -170,7 +170,7 @@ waitForSLBReady = fn(slbId,slbName) {
 createSLB = fn(vSwitchId, name, conf) {
 
 
-		clients = new aliyun.AliyunClients(CONFIG)
+	clients = new aliyun.AliyunClients(CONFIG)
 
 	addressType = conf.GetString("address-type", "internet")
 	chargeType = conf.GetString("charge-type", "paybytraffic")
@@ -178,7 +178,6 @@ createSLB = fn(vSwitchId, name, conf) {
 	describeArgs = &aliyun_slb.DescribeLoadBalancersArgs {
 						RegionId            : clients.Region(),
 						LoadBalancerName    : name,
-						VSwitchId           : vSwitchId,
   					}
 
 
