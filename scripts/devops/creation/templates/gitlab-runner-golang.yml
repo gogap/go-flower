@@ -1,0 +1,5 @@
+gitlab-runner:
+  image: 'xujinzheng/gitlab-runner-golang:1.8.3-alpine3.6'
+  restart: always
+  labels:
+    aliyun.scale: '3'

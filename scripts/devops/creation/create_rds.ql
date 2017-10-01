@@ -264,7 +264,7 @@ waitForRDSReady = fn(rdsName, instanceId) {
 
 createRDS = fn(vpcId, vSwitchId, rdsName, rdsConf) {
 
-	rdsKey = CODE + ".devops.aliyun.rds."+ rdsName
+	rdsKey = CODE + "::DEVOPS_ALIYUN_RDS_"+ rdsName
 
 	exists, err = REDIS.Exists(rdsKey).Result()
 
