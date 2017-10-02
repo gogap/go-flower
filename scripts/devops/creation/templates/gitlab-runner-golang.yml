@@ -1,5 +1,12 @@
 gitlab-runner:
   image: 'xujinzheng/gitlab-runner-golang:1.8.3-alpine3.6'
   restart: always
+  environment:
+  - CI_SERVER_URL=$CI_SERVER_URL
+  - REGISTRATION_TOKEN=$REGISTRATION_TOKEN
+  - RUNNER_TAG_LIST=$RUNNER_TAG_LIST
+  - RUNNER_EXECUTOR=$RUNNER_EXECUTOR
+  - REGISTER_LOCKED=$REGISTER_LOCKED
+  - REGISTER_RUN_UNTAGGED=$REGISTER_RUN_UNTAGGED
   labels:
     aliyun.scale: '3'

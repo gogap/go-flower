@@ -1,6 +1,113 @@
 import "../aliyun"
+import "../shell"
 
 include "../includes"
+
+waitFor = fn (projClient,clusterName,clusterId,currentPorj, waitConf) {
+
+	if waitConf == nil {
+		return
+	}
+
+	waitProjects = waitConf.GetStringList("projects")
+
+	println(waitProjects)
+
+	if len(waitProjects) == 0 {
+		return
+	}
+
+	wg = sync.NewWaitGroup()
+	wg.Add(len(waitProjects))
+
+	
+
+
+	for i=0;i<len(waitProjects);i++{
+
+		projName = waitProjects[i]
+
+		go fn(projName){
+
+			println(projName)
+
+			defer wg.Done()
+			
+			resp,err = projClient.GetProject(projName)
+
+			LOG.WithField("CODE", CODE).
+				WithField("CLUSTER_NAME", clusterName).
+				WithField("CLUSTER_ID", clusterId).
+				WithField("CURRENT_PROJECT", currentPorj).
+				WithField("WAIT_FOR_PROJECT", projName).
+				Infoln("Wating for project ready")
+			
+			if err!=nil {
+				LOG.WithField("CODE", CODE).
+					WithField("CLUSTER_NAME", clusterName).
+					WithField("CLUSTER_ID", clusterId).
+					WithField("CURRENT_PROJECT", currentPorj).
+					WithField("WAIT_FOR_PROJECT", projName).
+					Errorln(err)
+				return
+			}
+
+			s = structs.new(resp)
+
+			for {
+				
+				currentStatus = s.Field("CurrentState").Value()
+
+				if  currentStatus != "running" {
+
+					LOG.WithField("CODE", CODE).
+						WithField("CLUSTER_NAME", clusterName).
+						WithField("CLUSTER_ID", clusterId).
+						WithField("CURRENT_PROJECT", currentPorj).
+						WithField("WAIT_FOR_PROJECT", projName).
+						WithField("PROJECT_STATUS", currentStatus).
+						Debugln("Waiting...")
+
+					time.sleep(time.Second*5)
+					continue
+				}
+
+				services = s.Field("Services").Value()
+
+				total = len(services)
+				for i=0;i<len(services);i++{
+
+					srv = services[i]
+					srvStruct  = structs.new(srv)
+
+					if srvStruct.Field("CurrentState").Value() != "running" {
+						LOG.WithField("CODE", CODE).
+							WithField("CLUSTER_NAME", clusterName).
+							WithField("CLUSTER_ID", clusterId).
+							WithField("CURRENT_PROJECT", currentPorj).
+							WithField("WAIT_FOR_PROJECT", projName).
+							WithField("SERVICE_STATUS", services[i].CurrentState).
+							Debugln("Waiting...")
+
+						break
+					} else {
+						total=total-1
+					}
+				}
+
+				if total>0{
+					time.sleep(time.Second*5)
+					continue
+				} 
+
+				break
+			}
+		}(projName)
+	}
+
+	wg.Wait()
+	
+}
 
 
 createProject = fn(clusterName, name, projectConf) {
@@ -65,6 +172,10 @@ createProject = fn(clusterName, name, projectConf) {
 
 	envsConf = projectConf.GetConfig("environment")
 
+	waitConf = projectConf.GetConfig("wait")
+
+	waitFor(projClient,clusterName, clusterId, name, waitConf)
+
 	if envsConf!=nil {
 			envKeys = envsConf.Keys()
 
@@ -98,7 +209,6 @@ createProject = fn(clusterName, name, projectConf) {
 						err=nil
 					}
 
-					
 
 					ks = ["DEVOPS", clusterName, name, key]
  
@@ -128,7 +238,11 @@ createProject = fn(clusterName, name, projectConf) {
 							WithField("PWGEN", val).
 							Warnln("Set redis failure, so print this password")
 					}
+				} elif val == "$.INPUT" {
+					println("xxxx")
+		 			val = shell.Scanner.Input(key)
 				}
+
 				mapENVs[key] = val
 			}
 	}
