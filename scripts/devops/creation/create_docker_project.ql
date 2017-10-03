@@ -11,8 +11,6 @@ waitFor = fn (projClient,clusterName,clusterId,currentPorj, waitConf) {
 
 	waitProjects = waitConf.GetStringList("projects")
 
-	println(waitProjects)
-
 	if len(waitProjects) == 0 {
 		return
 	}
@@ -28,8 +26,6 @@ waitFor = fn (projClient,clusterName,clusterId,currentPorj, waitConf) {
 		projName = waitProjects[i]
 
 		go fn(projName){
-
-			println(projName)
 
 			defer wg.Done()
 			
@@ -239,7 +235,6 @@ createProject = fn(clusterName, name, projectConf) {
 							Warnln("Set redis failure, so print this password")
 					}
 				} elif val == "$.INPUT" {
-					println("xxxx")
 		 			val = shell.Scanner.Input(key)
 				}
 

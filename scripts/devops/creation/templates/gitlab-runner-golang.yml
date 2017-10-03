@@ -1,6 +1,8 @@
 gitlab-runner:
   image: 'xujinzheng/gitlab-runner-golang:1.8.3-alpine3.6'
   restart: always
+  links:
+  - docker
   environment:
   - CI_SERVER_URL=$CI_SERVER_URL
   - REGISTRATION_TOKEN=$REGISTRATION_TOKEN
@@ -8,5 +10,10 @@ gitlab-runner:
   - RUNNER_EXECUTOR=$RUNNER_EXECUTOR
   - REGISTER_LOCKED=$REGISTER_LOCKED
   - REGISTER_RUN_UNTAGGED=$REGISTER_RUN_UNTAGGED
+  - DOCKER_HOST=tcp://docker:2375
   labels:
     aliyun.scale: '3'
+docker:
+  image: docker:stable-dind
+  privileged: true
+  aliyun.probe.url: tcp://container:2375
